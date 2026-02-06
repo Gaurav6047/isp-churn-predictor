@@ -20,7 +20,7 @@ st.sidebar.write("""
 - High monthly bill increases risk  
 """)
 
-st.sidebar.write("Built for Interview Demo")
+
 
 # ===== MAIN PAGE =====
 
@@ -118,7 +118,7 @@ if st.button("Predict Risk"):
 # ===== INTERVIEW SECTION =====
 
 st.markdown("---")
-st.subheader("Model Summary (For Interview)")
+st.subheader("Model Summary")
 
 st.write("""
 • Baseline Recall: 51%  
@@ -132,3 +132,4 @@ st.write("""
   - Capture risky users early  
   - Positive ROI despite false alarms  
 """)
+
