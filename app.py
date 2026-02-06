@@ -4,26 +4,59 @@ import pandas as pd
 
 model = joblib.load("churn_pipeline.pkl")
 
-st.title("ISP Customer Churn Prediction System”")
+# ===== SIDEBAR INFO =====
+st.sidebar.title("About Project")
 
-st.write("Enter customer details")
+st.sidebar.write("""
+**ISP Customer Churn Prediction**
 
-tenure = st.number_input("Tenure (months)", min_value=0, max_value=72, value=5)
+• Dataset: 7k+ ISP customers  
+• Model: Logistic Regression  
+• Focus Metric: Recall (85%)  
 
-monthly = st.number_input("Monthly Charges", value=70.0)
+**Key Insights**
+- Month-to-month users most risky  
+- No Tech Support → high churn  
+- High monthly bill increases risk  
+""")
 
-contract = st.selectbox(
-    "Contract Type",
-    ["Month-to-month", "One year", "Two year"]
-)
+st.sidebar.write("Built for Interview Demo")
 
-internet = st.selectbox(
-    "Internet Service",
-    ["DSL", "Fiber optic", "No"]
-)
+# ===== MAIN PAGE =====
 
-support = st.selectbox("Tech Support", ["Yes", "No"])
-security = st.selectbox("Online Security", ["Yes", "No"])
+st.title("ISP Customer Churn Prediction System")
+
+st.write("""
+### Business Goal
+Identify customers likely to leave so company can take actions:
+- Discount offers  
+- Tech support calls  
+- Plan upgrade  
+""")
+
+# ===== INPUT FORM =====
+
+st.subheader("Enter Customer Details")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    tenure = st.number_input("Tenure (months)", 0, 72, 5)
+    monthly = st.number_input("Monthly Charges", 0.0, 150.0, 70.0)
+
+    contract = st.selectbox(
+        "Contract Type",
+        ["Month-to-month", "One year", "Two year"]
+    )
+
+with col2:
+    internet = st.selectbox(
+        "Internet Service",
+        ["DSL", "Fiber optic", "No"]
+    )
+
+    support = st.selectbox("Tech Support", ["Yes", "No"])
+    security = st.selectbox("Online Security", ["Yes", "No"])
 
 payment = st.selectbox(
     "Payment Method",
@@ -31,19 +64,10 @@ payment = st.selectbox(
      "Bank transfer (automatic)", "Credit card (automatic)"]
 )
 
-# ---- Encoding same as training ----
-contract_map = {
-    "Month-to-month":0,
-    "One year":1,
-    "Two year":2
-}
+# ===== ENCODING =====
 
-internet_map = {
-    "No":0,
-    "DSL":1,
-    "Fiber optic":2
-}
-
+contract_map = {"Month-to-month":0, "One year":1, "Two year":2}
+internet_map = {"No":0, "DSL":1, "Fiber optic":2}
 payment_map = {
     "Electronic check":0,
     "Mailed check":1,
@@ -66,16 +90,45 @@ if st.button("Predict Risk"):
 
     prob = model.predict_proba(data)[0][1]
 
+    st.subheader("Result")
+
     if prob > 0.7:
         risk = "HIGH RISK"
-        action = "Call + Discount + Tech Support Offer"
+        color = "red"
+        action = """
+        • Immediate call  
+        • Discount offer  
+        • Free tech support  
+        """
     elif prob > 0.4:
         risk = "MEDIUM RISK"
-        action = "Send Offer SMS / Plan Upgrade"
+        color = "orange"
+        action = "• Send offer SMS • Plan suggestion"
     else:
         risk = "LOW RISK"
-        action = "Normal Monitoring"
+        color = "green"
+        action = "• Normal monitoring"
 
-    st.subheader(f"Risk: {risk}")
-    st.write("Probability:", round(prob,3))
-    st.write("Suggested Action:", action)
+    st.markdown(f"### Risk Level: :{color}[{risk}]")
+    st.write("Probability:", round(prob, 3))
+
+    st.subheader("Recommended Action")
+    st.write(action)
+
+# ===== INTERVIEW SECTION =====
+
+st.markdown("---")
+st.subheader("Model Summary (For Interview)")
+
+st.write("""
+• Baseline Recall: 51%  
+• After Class Weight: 85%  
+• Key Drivers:  
+  - Contract Type  
+  - Tech Support  
+  - Monthly Charges  
+
+• Business Impact:  
+  - Capture risky users early  
+  - Positive ROI despite false alarms  
+""")
